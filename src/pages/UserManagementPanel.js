@@ -20,6 +20,8 @@ import {
 } from '@mui/material';
 import Layout from '../components/Layout';
 
+const BACKEND_URL = 'https://barge-backend.onrender.com';
+
 const UserManagementPanel = () => {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState({ username: '', password: '', role: 'viewer' });
@@ -33,7 +35,7 @@ const UserManagementPanel = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('/api/users');
+      const res = await axios.get(`${BACKEND_URL}/api/users`);
       setUsers(res.data);
     } catch (err) {
       console.error('[ERROR] Failed to fetch users:', err);
@@ -52,7 +54,7 @@ const UserManagementPanel = () => {
   const handleAddUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/users', newUser);
+      await axios.post(`${BACKEND_URL}/api/users`, newUser);
       setNewUser({ username: '', password: '', role: 'viewer' });
       setMessage('✅ User added successfully');
       setError(null);
@@ -73,7 +75,7 @@ const UserManagementPanel = () => {
 
   const handleUpdateUser = async (id) => {
     try {
-      await axios.put(`/api/users/${id}`, {
+      await axios.put(`${BACKEND_URL}/api/users/${id}`, {
         role: editRole,
         password: editPassword || undefined,
       });
@@ -89,7 +91,7 @@ const UserManagementPanel = () => {
 
   const handleDeleteUser = async (id) => {
     try {
-      await axios.delete(`/api/users/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/users/${id}`);
       setMessage('🗑️ User deleted');
       setError(null);
       fetchUsers();

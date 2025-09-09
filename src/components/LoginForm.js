@@ -1,6 +1,7 @@
+// src/components/LoginForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Box, TextField, Button, Typography, Alert } from '@mui/material';
+import { Box, TextField, Button, Alert } from '@mui/material';
 
 const LoginForm = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -12,7 +13,10 @@ const LoginForm = ({ onLogin }) => {
     setError('');
 
     try {
-      const res = await axios.post('/api/login', { username, password });
+      const res = await axios.post(
+        'https://barge-backend.onrender.com/api/login',
+        { username, password }
+      );
       onLogin(res.data.user); // send user object up to App.js
     } catch (err) {
       console.error('Login failed:', err);

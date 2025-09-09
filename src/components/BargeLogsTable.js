@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
+const BASE_URL = 'https://barge-backend.onrender.com';
+
 const BargeLogsTable = ({ user }) => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,8 +20,8 @@ const BargeLogsTable = ({ user }) => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await axios.get('/api/barge-logs');
-        setLogs(res.data);
+        const res = await axios.get(`${BASE_URL}/api/barge-logs`);
+        setLogs(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error('❌ Error fetching logs:', err.response?.data || err.message);
       } finally {
@@ -125,7 +127,13 @@ const BargeLogsTable = ({ user }) => {
 
       <Paper elevation={3}>
         <div style={{ height: 600, width: '100%' }}>
-          <DataGrid rows={rows} columns={columns} pageSize={10} rowsPerPageOptions={[10]} />
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableRowSelectionOnClick
+          />
         </div>
       </Paper>
     </Box>

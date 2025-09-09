@@ -11,6 +11,8 @@ import {
   Grid
 } from '@mui/material';
 
+const BASE_URL = 'https://barge-backend.onrender.com';
+
 const BargeEntryForm = () => {
   const [bargeOptions, setBargeOptions] = useState([]);
   const [locationOptions, setLocationOptions] = useState([]);
@@ -36,10 +38,10 @@ const BargeEntryForm = () => {
     const fetchDropdownData = async () => {
       try {
         const [bargesRes, locationsRes, supervisorsRes, laborTeamsRes] = await Promise.all([
-          fetch('http://localhost:3001/api/barges'),
-          fetch('http://localhost:3001/api/locations'),
-          fetch('http://localhost:3001/api/supervisors'),
-          fetch('http://localhost:3001/api/labor-teams')
+          fetch(`${BASE_URL}/api/barges`),
+          fetch(`${BASE_URL}/api/locations`),
+          fetch(`${BASE_URL}/api/supervisors`),
+          fetch(`${BASE_URL}/api/labor-teams`)
         ]);
 
         const [barges, locations, supervisors, laborTeams] = await Promise.all([
@@ -49,10 +51,10 @@ const BargeEntryForm = () => {
           laborTeamsRes.json()
         ]);
 
-        setBargeOptions(barges);
-        setLocationOptions(locations);
-        setSupervisorOptions(supervisors);
-        setLaborTeamOptions(laborTeams);
+        setBargeOptions(Array.isArray(barges) ? barges : []);
+        setLocationOptions(Array.isArray(locations) ? locations : []);
+        setSupervisorOptions(Array.isArray(supervisors) ? supervisors : []);
+        setLaborTeamOptions(Array.isArray(laborTeams) ? laborTeams : []);
       } catch (err) {
         console.error("Failed to fetch dropdown data", err);
       }
@@ -69,7 +71,7 @@ const BargeEntryForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:3001/api/barge-entry', {
+      const res = await fetch(`${BASE_URL}/api/barge-entry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -77,7 +79,7 @@ const BargeEntryForm = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert('Entry submitted successfully!');
+        alert('✅ Entry submitted successfully!');
         console.log('Response:', data);
         setFormData({
           bargeId: '', status: '', locationId: '', arrivalTime: '', berthingTime: '',
@@ -85,11 +87,11 @@ const BargeEntryForm = () => {
           motherVessel: '', supervisorId: '', laborTeamId: ''
         });
       } else {
-        alert('Error: ' + data.message);
+        alert('❌ Error: ' + data.message);
         console.error(data);
       }
     } catch (err) {
-      alert('Network or server error');
+      alert('❌ Network or server error');
       console.error(err);
     }
   };
@@ -101,6 +103,7 @@ const BargeEntryForm = () => {
       <Typography variant="h5" gutterBottom>Barge Entry Form</Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
+          {/* Barge Dropdown */}
           <Grid item xs={12} md={6}>
             <FormControl fullWidth required sx={dropdownStyle}>
               <InputLabel>Barge</InputLabel>
@@ -113,6 +116,7 @@ const BargeEntryForm = () => {
             </FormControl>
           </Grid>
 
+          {/* Status Dropdown */}
           <Grid item xs={12} md={6}>
             <FormControl fullWidth required sx={dropdownStyle}>
               <InputLabel>Status</InputLabel>
@@ -125,6 +129,7 @@ const BargeEntryForm = () => {
             </FormControl>
           </Grid>
 
+          {/* Location Dropdown */}
           <Grid item xs={12} md={6}>
             <FormControl fullWidth required sx={dropdownStyle}>
               <InputLabel>Location</InputLabel>
@@ -137,6 +142,7 @@ const BargeEntryForm = () => {
             </FormControl>
           </Grid>
 
+          {/* DateTime Fields */}
           {['arrivalTime', 'berthingTime', 'castOffTime', 'fuelTimestamp'].map((field) => (
             <Grid item xs={12} md={6} key={field}>
               <TextField
@@ -151,6 +157,7 @@ const BargeEntryForm = () => {
             </Grid>
           ))}
 
+          {/* Number Fields */}
           {['draftIn', 'draftOut', 'fuelQuantity'].map(field => (
             <Grid item xs={12} md={6} key={field}>
               <TextField
@@ -165,6 +172,7 @@ const BargeEntryForm = () => {
             </Grid>
           ))}
 
+          {/* Mother Vessel */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -176,7 +184,9 @@ const BargeEntryForm = () => {
             />
           </Grid>
 
-          {[{ name: 'supervisorId', options: supervisorOptions, label: 'Supervisor' }, { name: 'laborTeamId', options: laborTeamOptions, label: 'Labor Team' }].map(({ name, options, label }) => (
+          {/* Supervisor & Labor Team */}
+          {[{ name: 'supervisorId', options: supervisorOptions, label: 'Supervisor' },
+            { name: 'laborTeamId', options: laborTeamOptions, label: 'Labor Team' }].map(({ name, options, label }) => (
             <Grid item xs={12} md={6} key={name}>
               <FormControl fullWidth sx={dropdownStyle}>
                 <InputLabel>{label}</InputLabel>
@@ -190,6 +200,7 @@ const BargeEntryForm = () => {
             </Grid>
           ))}
 
+          {/* Submit Button */}
           <Grid item xs={12}>
             <Button variant="contained" color="primary" type="submit" fullWidth>
               Submit Entry
